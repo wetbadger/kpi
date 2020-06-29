@@ -5,6 +5,8 @@ from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.reverse import reverse
 
+from a1d05eba1 import Content
+
 from kpi.constants import PERM_PARTIAL_SUBMISSIONS, PERM_VIEW_SUBMISSIONS
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField, \
     PaginatedApiField
@@ -18,7 +20,7 @@ from .asset_version import AssetVersionListSerializer
 from .asset_permission_assignment import AssetPermissionAssignmentSerializer
 
 
-class AssetSerializer(serializers.HyperlinkedModelSerializer):
+class AssetSerializerBase(serializers.HyperlinkedModelSerializer):
 
     owner = RelativePrefixHyperlinkedRelatedField(
         view_name='user-detail', lookup_field='username', read_only=True)
@@ -27,11 +29,11 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='uid', view_name='asset-detail')
     asset_type = serializers.ChoiceField(choices=ASSET_TYPES)
     settings = WritableJSONField(required=False, allow_blank=True)
-    content = WritableJSONField(required=False)
     report_styles = WritableJSONField(required=False)
     report_custom = WritableJSONField(required=False)
     map_styles = WritableJSONField(required=False)
     map_custom = WritableJSONField(required=False)
+    diff = serializers.SerializerMethodField()
     xls_link = serializers.SerializerMethodField()
     summary = serializers.ReadOnlyField()
     koboform_link = serializers.SerializerMethodField()
@@ -82,6 +84,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                   'settings',
                   'asset_type',
                   'date_created',
+                  'diff',
                   'summary',
                   'date_modified',
                   'version_id',
@@ -123,19 +126,8 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             },
         }
 
-    def update(self, asset, validated_data):
-        asset_content = asset.content
-        _req_data = self.context['request'].data
-        _has_translations = 'translations' in _req_data
-        _has_content = 'content' in _req_data
-        if _has_translations and not _has_content:
-            translations_list = json.loads(_req_data['translations'])
-            try:
-                asset.update_translation_list(translations_list)
-            except ValueError as err:
-                raise serializers.ValidationError(str(err))
-            validated_data['content'] = asset_content
-        return super().update(asset, validated_data)
+    def get_diff(self, asset):
+        return asset.latest_change()
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
@@ -324,12 +316,42 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                        args=(obj.uid,),
                        request=request)
 
+class AssetSerializerContentV1(AssetSerializerBase):
+    content = WritableJSONField(required=False, source='content_v1')
 
-class AssetListSerializer(AssetSerializer):
-    class Meta(AssetSerializer.Meta):
+class AssetListSerializer(AssetSerializerBase):
+    class Meta(AssetSerializerBase.Meta):
         # WARNING! If you're changing something here, please update
         # `Asset.optimize_queryset_for_list()`; otherwise, you'll cause an
         # additional database query for each asset in the list.
+        fields = ('url',
+                  'date_modified',
+                  'date_created',
+                  'owner',
+                  'summary',
+                  'owner__username',
+                  'parent',
+                  'uid',
+                  'tag_string',
+                  'settings',
+                  'kind',
+                  'name',
+                  'asset_type',
+                  'version_id',
+                  'has_deployment',
+                  'deployed_version_id',
+                  'deployment__identifier',
+                  'deployment__active',
+                  'deployment__submission_count',
+                  'permissions',
+                  'downloads',
+                  'data',
+                  )
+class AssetSerializerContentV2(AssetSerializerBase):
+    content = WritableJSONField(required=False, source='content_v2')
+
+class AssetListSerializer(AssetSerializerBase):
+    class Meta(AssetSerializerBase.Meta):
         fields = ('url',
                   'date_modified',
                   'date_created',
@@ -380,7 +402,7 @@ class AssetListSerializer(AssetSerializer):
                                                    context=context).data
 
 
-class AssetUrlListSerializer(AssetSerializer):
+class AssetUrlListSerializer(AssetSerializerBase):
 
-    class Meta(AssetSerializer.Meta):
+    class Meta(AssetSerializerBase.Meta):
         fields = ('url',)

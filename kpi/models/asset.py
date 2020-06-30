@@ -19,12 +19,17 @@ from jsonfield import JSONField
 from taggit.managers import TaggableManager, _TaggableManager
 from taggit.utils import require_instance_manager
 
+# new package. name tbd
+from a1d05eba1 import Content
+
 from formpack import FormPack
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import flatten_to_spreadsheet_content
 from kobo.apps.reports.constants import (SPECIFIC_REPORTS_KEY,
                                          DEFAULT_REPORTS_KEY)
+
+
 from kpi.constants import (
     ASSET_TYPES,
     ASSET_TYPE_BLOCK,
@@ -396,15 +401,9 @@ class XlsExportable:
                                 kobo_specific_types=False,
                                 append=None):
         # currently, this method depends on "FormpackXLSFormUtils"
-        content = copy.deepcopy(self.content)
+        content = Content(self.content).export(schema='xlsform')
         if append:
             self._append(content, **append)
-        self._standardize(content)
-        if not kobo_specific_types:
-            self._expand_kobo_qs(content)
-            self._autoname(content)
-            self._populate_fields_with_autofields(content)
-            self._strip_kuids(content)
         content = OrderedDict(content)
         self._xlsform_structure(content, ordered=True, kobo_specific=kobo_specific_types)
         return content
@@ -465,6 +464,7 @@ class XlsExportable:
 
         output.seek(0)
         return output
+
 
 
 class Asset(ObjectPermissionMixin,
@@ -624,40 +624,6 @@ class Asset(ObjectPermissionMixin,
     def __str__(self):
         return '{} ({})'.format(self.name, self.uid)
 
-    def adjust_content_on_save(self):
-        """
-        This is called on save by default if content exists.
-        Can be disabled / skipped by calling with parameter:
-        asset.save(adjust_content=False)
-        """
-        self._standardize(self.content)
-
-        self._make_default_translation_first(self.content)
-        self._strip_empty_rows(self.content)
-        self._assign_kuids(self.content)
-        self._autoname(self.content)
-        self._unlink_list_items(self.content)
-        self._remove_empty_expressions(self.content)
-
-        settings = self.content['settings']
-        _title = settings.pop('form_title', None)
-        id_string = settings.get('id_string')
-        filename = self.summary.pop('filename', None)
-        if filename:
-            # if we have filename available, set the id_string
-            # and/or form_title from the filename.
-            if not id_string:
-                id_string = sluggify_label(filename)
-                settings['id_string'] = id_string
-            if not _title:
-                _title = filename
-        if self.asset_type not in [ASSET_TYPE_SURVEY, ASSET_TYPE_TEMPLATE]:
-            # instead of deleting the settings, simply clear them out
-            self.content['settings'] = {}
-
-        if _title is not None:
-            self.name = _title
-
     def clone(self, version_uid=None):
         # not currently used, but this is how "to_clone_dict" should work
         return Asset.objects.create(**self.to_clone_dict(version_uid))
@@ -666,6 +632,33 @@ class Asset(ObjectPermissionMixin,
     def deployed_versions(self):
         return self.asset_versions.filter(deployed=True).order_by(
             '-date_modified')
+
+    # asset.content_v2 guaranteed to provide content with schema="2"
+    @property
+    def content_v2(self):
+        return Content(self.content).export(schema='2')
+
+    @content_v2.setter
+    def content_v2(self, content):
+        self.content = Content(content).export(schema='2')
+
+    # asset.content_v2 guaranteed to provide content with schema="1"
+    @property
+    def content_v1(self):
+        cc = Content({'schema': '1+::', **self.content})
+        cc.txs.reorder()
+        return cc.export(schema='1')
+
+    @content_v1.setter
+    def content_v1(self, content):
+        self.content = Content(content).export(schema='2')
+
+    def from_xlsform(self, content, filename=None):
+        _imported = Content({'schema': 'xlsform', **content},
+                            generate_anchors=True)
+        self.content = _imported.export(schema='2')
+        if filename:
+            self.summary = { 'filename': filename }
 
     def get_ancestors_or_none(self):
         # ancestors are ordered from farthest to nearest
@@ -838,17 +831,19 @@ class Asset(ObjectPermissionMixin,
         self.content = av.version_content
         self.save()
 
+    def latest_change(self, symmetric=False, syntax='compact'):
+        def _to_schema_2(cc):
+            content = cc if 'schema' in cc else {**cc, 'schema': '1+::'}
+            return Content(content).export(schema='2+flatten_survey_by_anchor')
+        return self.latest_version.diff_from_previous()
+
     def save(self, *args, **kwargs):
-        if self.content is None:
-            self.content = {}
-
-        # in certain circumstances, we don't want content to
-        # be altered on save. (e.g. on asset.deploy())
-        if kwargs.pop('adjust_content', True):
-            self.adjust_content_on_save()
-
-        # populate summary
-        self._populate_summary()
+        if len(self.content) == 0:
+            self.content = {'survey':[],
+                            'settings': {},
+                            'schema':'2',
+                            'translations': [],
+                            }
 
         # infer asset_type only between question and block
         if self.asset_type in [ASSET_TYPE_QUESTION, ASSET_TYPE_BLOCK]:
@@ -861,8 +856,6 @@ class Asset(ObjectPermissionMixin,
                     self.asset_type = ASSET_TYPE_QUESTION
                 elif row_count > 1:
                     self.asset_type = ASSET_TYPE_BLOCK
-
-        self._populate_report_styles()
 
         _create_version = kwargs.pop('create_version', True)
         super().save(*args, **kwargs)

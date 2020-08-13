@@ -11,12 +11,11 @@ from django.utils import timezone
 from jsondiff import patch as jsondiff_patch
 from jsondiff import diff as jsondiff_diff
 
-from a1d05eba1 import Content
-
-from formpack.utils.expand_content import expand_content
 from reversion.models import Version
 
 from kpi.fields import KpiUidField
+from kpi.utils.kobo_content import KoboContent, diffable_kobo_content_export
+from kpi.utils.kobo_content import get_content_object
 from kpi.utils.kobo_to_xlsform import to_xlsform_structure
 from kpi.utils.strings import hashable_str
 
@@ -48,6 +47,7 @@ class AssetVersion(models.Model):
     def _deployed_content(self):
         if self.deployed_content is not None:
             return self.deployed_content
+        # TODO: handle cases where _reversion_version is set
         legacy_names = self._reversion_version is not None
         if legacy_names:
             return to_xlsform_structure(self.version_content,
@@ -57,12 +57,13 @@ class AssetVersion(models.Model):
                                         move_autonames=True)
 
     def to_formpack_schema(self):
-        return {
-            'content': expand_content(self._deployed_content()),
+        cc = get_content_object(self.version_content).export(schema='2')
+        cc['settings'].update({
+            'title': self.name,
             'version': self.uid,
-            'version_id_key': '__version__',
-        }
-
+            'version_key': '__version__',
+        })
+        return cc
 
     def diff_from_previous(self):
         _avs = self.asset.asset_versions
@@ -84,10 +85,10 @@ class AssetVersion(models.Model):
         syntax = kwargs.get('syntax', 'jsondiff.compact')
         vv = kls.objects.get(uid=parent_uid)
         vvc = vv.version_content
-        cc1 = Content(vvc).export(schema=schema)
+        cc1 = KoboContent(vvc).export(schema=schema)
         content = {}
         if syntax == 'jsondiff.compact':
-            content = Content(
+            content = KoboContent(
                 jsondiff_patch(cc1, patch, marshal=True, syntax='compact')
             ).export(schema='2')
         if save:
@@ -96,27 +97,17 @@ class AssetVersion(models.Model):
             asset.save()
         return content
 
-
     def diff_from(self, parent_version=None, syntax='compact'):
-        # if no other 'schema' is set, this is the default:
-        schema_in = '1+flattened_translations'
-
-        # the diff compares versions with this schema:
-        schema_out = '2+anchors'
-
-        def _to_schema_2(cc):
-            content = cc if 'schema' in cc else {**cc, 'schema': '1+::'}
-            return Content(content).export(schema=schema_out)
-
         # current version content
-        cvc = _to_schema_2(self.version_content)
+        cvc = diffable_kobo_content_export(self.version_content)
         # previous version content
+        schema_out = cvc['schema']
         pvc = {}
         parent_uid = None
 
         if parent_version is not None:
             parent_uid = parent_version.uid
-            pvc = _to_schema_2(parent_version.version_content)
+            pvc = diffable_kobo_content_export(parent_version.version_content)
 
         return {'parent': parent_uid,
                 'syntax': 'jsondiff.{}'.format(syntax),

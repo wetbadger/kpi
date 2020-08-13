@@ -90,5 +90,9 @@
   "author": "alex.dorey@kobotoolbox.org, esmail.fadae@kobotoolbox.org, john.milner@kobotoolbox.org",
   "license": "AGPL-3.0",
   "bugs": "https://github.com/kobotoolbox/kpi/issues",
-  "homepage": "https://github.com/kobotoolbox/kpi"
+  "homepage": "https://github.com/kobotoolbox/kpi",
+  "dependencies": {
+    "json-delta": "^1.0.1",
+    "jsondiffpatch": "^0.4.1"
+  }
 }

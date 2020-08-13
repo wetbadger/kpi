@@ -1,6 +1,7 @@
 # coding: utf-8
+import json
+
 from django.urls import reverse
-from formpack.utils.expand_content import SCHEMA_VERSION
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -19,13 +20,19 @@ class BaseTestCase(APITestCase):
 
 
 class BaseAssetTestCase(BaseTestCase):
-
-    EMPTY_SURVEY = {'survey': [], 'schema': SCHEMA_VERSION, 'settings': {}}
+    EMPTY_SURVEY = {'survey': [],
+                    'schema': '2',
+                    'settings': {},
+                    'choices': {},
+                    'metas': {},
+                    'translations': [],
+                    }
+    EMPTY_SURVEY_JSON = json.dumps(EMPTY_SURVEY)
 
     def create_asset(self, asset_type='survey'):
         """ Create a new, empty asset as the currently logged-in user """
         data = {
-            'content': '{}',
+            'content': self.EMPTY_SURVEY_JSON,
             'asset_type': asset_type,
         }
         list_url = reverse(self._get_endpoint('asset-list'))

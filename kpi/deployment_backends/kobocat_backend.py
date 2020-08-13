@@ -226,8 +226,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         xls_io = self.asset.to_xls_io(
             versioned=True, append={
                 'settings': {
-                    'id_string': id_string,
-                    'form_title': self.asset.name,
+                    'identifier': id_string,
+                    'title': self.asset.name,
                 }
             }
         )
@@ -267,8 +267,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         xls_io = self.asset.to_xls_io(
             versioned=True, append={
                 'settings': {
-                    'id_string': id_string,
-                    'form_title': self.asset.name,
+                    'identifier': id_string,
+                    'title': self.asset.name,
                 }
             }
         )
@@ -424,6 +424,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         return self.__prepare_as_drf_response_signature(kc_response)
 
     def get_enketo_survey_links(self):
+        return {}
         data = {
             'server_url': '{}/{}'.format(
                 settings.KOBOCAT_URL.rstrip('/'),
@@ -750,4 +751,3 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 }
 
         return prepared_drf_response
-

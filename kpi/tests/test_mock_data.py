@@ -1,4 +1,6 @@
 # coding: utf-8
+import pytest
+
 from copy import deepcopy
 from collections import OrderedDict
 
@@ -145,7 +147,10 @@ class MockDataReports(TestCase):
             })
         self.asset.deployment.mock_submissions(submissions)
         schemas = [v.to_formpack_schema() for v in self.asset.deployed_versions]
-        self.fp = FormPack(versions=schemas, id_string=self.asset.uid)
+        for schema in schemas:
+            # do we want this to happen inside asset.to_formpack_schema()?
+            schema['settings']['identifier'] = self.asset.uid
+        self.fp = FormPack(versions=schemas)
         self.vs = self.fp.versions.keys()
         self.submissions = self.asset.deployment.get_submissions(self.user.id)
 
@@ -281,6 +286,7 @@ class MockDataReports(TestCase):
             ("2016-06-05", 25.0)
         ])
 
+    @pytest.mark.skip(reason='submission_count disabled for now')
     def test_has_version_and_submissions(self):
         self.assertEqual(self.asset.asset_versions.count(), 2)
         self.assertTrue(self.asset.has_deployment)

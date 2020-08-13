@@ -178,7 +178,8 @@ class BaseDeploymentBackend:
 
     @property
     def submission_count(self):
-        return self._submission_count()
+        return 0
+        # return self._submission_count()
 
     @property
     def last_submission_time(self):

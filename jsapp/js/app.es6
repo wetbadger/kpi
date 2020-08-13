@@ -41,7 +41,7 @@ import FormLanding from './components/formLanding';
 import FormSummary from './components/formSummary';
 import FormSubScreens from './components/formSubScreens';
 import FormViewTabs from './components/formViewTabs';
-import IntercomHandler from './components/intercomHandler';
+// import IntercomHandler from './components/intercomHandler';
 import PermValidator from './components/permissions/permValidator';
 import Modal from './components/modal';
 import AccountSettings from './components/accountSettings';
@@ -118,7 +118,6 @@ class App extends React.Component {
           isolate>
 
         <PermValidator/>
-        <IntercomHandler/>
 
           { !this.isFormBuilder() &&
             <div className='k-header__bar' />

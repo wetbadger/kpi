@@ -239,7 +239,7 @@ export default assign({
     }
     (()=>{
       let survey = JSON.parse(surveyJSON);
-      survey.schema = '1+::';
+      survey.schema = '1+koboxlsform';
       surveyJSON = JSON.stringify(survey);
     })()
 

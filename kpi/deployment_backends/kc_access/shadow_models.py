@@ -208,23 +208,24 @@ class KobocatUser(ShadowModel):
     def sync(cls, auth_user):
         # NB: `KobocatUserObjectPermission` (and probably other things) depend
         # upon PKs being synchronized between KPI and KoBoCAT
-        try:
-            kc_auth_user = cls.objects.get(pk=auth_user.pk)
-            assert kc_auth_user.username == auth_user.username
-        except KobocatUser.DoesNotExist:
-            kc_auth_user = cls(pk=auth_user.pk, username=auth_user.username)
-
-        kc_auth_user.password = auth_user.password
-        kc_auth_user.last_login = auth_user.last_login
-        kc_auth_user.is_superuser = auth_user.is_superuser
-        kc_auth_user.first_name = auth_user.first_name
-        kc_auth_user.last_name = auth_user.last_name
-        kc_auth_user.email = auth_user.email
-        kc_auth_user.is_staff = auth_user.is_staff
-        kc_auth_user.is_active = auth_user.is_active
-        kc_auth_user.date_joined = auth_user.date_joined
-
-        kc_auth_user.save()
+        # try:
+        #     kc_auth_user = cls.objects.get(pk=auth_user.pk)
+        #     assert kc_auth_user.username == auth_user.username
+        # except KobocatUser.DoesNotExist:
+        #     kc_auth_user = cls(pk=auth_user.pk, username=auth_user.username)
+        #
+        # kc_auth_user.password = auth_user.password
+        # kc_auth_user.last_login = auth_user.last_login
+        # kc_auth_user.is_superuser = auth_user.is_superuser
+        # kc_auth_user.first_name = auth_user.first_name
+        # kc_auth_user.last_name = auth_user.last_name
+        # kc_auth_user.email = auth_user.email
+        # kc_auth_user.is_staff = auth_user.is_staff
+        # kc_auth_user.is_active = auth_user.is_active
+        # kc_auth_user.date_joined = auth_user.date_joined
+        #
+        # kc_auth_user.save()
+        pass
 
         # We've manually set a primary key, so `last_value` in the sequence
         # `auth_user_id_seq` now lags behind `max(id)`. Fix it now!
@@ -353,7 +354,7 @@ class KobocatToken(ShadowModel):
     def sync(cls, auth_token):
         try:
             # Token use a One-to-One relationship on User.
-            # Thus, we can retrieve tokens from users' id. 
+            # Thus, we can retrieve tokens from users' id.
             kc_auth_token = cls.objects.get(user_id=auth_token.user_id)
         except KobocatToken.DoesNotExist:
             kc_auth_token = cls(pk=auth_token.pk, user_id=auth_token.user_id)
@@ -378,15 +379,16 @@ class KobocatDigestPartial(ShadowModel):
         but updates `KobocatDigestPartial` in the KoBoCAT database instead of
         `PartialDigest` in the KPI database
         """
-        cls.objects.filter(user=user).delete()
-        # Query for `user_id` since user PKs are synchronized
-        for partial_digest in PartialDigest.objects.filter(user_id=user.pk):
-            cls.objects.create(
-                user=user,
-                login=partial_digest.login,
-                confirmed=partial_digest.confirmed,
-                partial_digest=partial_digest.partial_digest,
-            )
+        # cls.objects.filter(user=user).delete()
+        # # Query for `user_id` since user PKs are synchronized
+        # for partial_digest in PartialDigest.objects.filter(user_id=user.pk):
+        #     cls.objects.create(
+        #         user=user,
+        #         login=partial_digest.login,
+        #         confirmed=partial_digest.confirmed,
+        #         partial_digest=partial_digest.partial_digest,
+        #     )
+        pass
 
 
 def safe_kc_read(func):

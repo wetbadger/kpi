@@ -275,9 +275,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Yes";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test()
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test()):
+            assert a == b
 
     def test_csv_export_default_options_partial_submissions(self):
         expected_lines = [
@@ -285,9 +284,8 @@ class MockDataExports(TestCase):
             _csv_tag_row(14, (2, 'symmetry'), (6, 'segments'), (7, 'fluids')),
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"1"',
         ]
-        lines = self.run_csv_export_test(user=self.anotheruser)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(user=self.anotheruser)):
+            assert a == b
 
     def test_csv_export_english_labels(self):
         export_options = {
@@ -300,9 +298,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Yes";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test(export_options)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_csv_export_spanish_labels(self):
         export_options = {
@@ -315,9 +312,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Sí";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Inseguro";"Sí";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test(export_options)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_csv_export_english_labels_no_hxl(self):
         export_options = {
@@ -330,9 +326,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Yes";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test(export_options)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_csv_export_english_labels_group_sep(self):
         # Check `group_sep` by looking at the `select_multiple` question
@@ -347,9 +342,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Yes";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test(export_options)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_csv_export_hierarchy_in_labels(self):
         export_options = {'hierarchy_in_labels': 'true'}
@@ -360,9 +354,8 @@ class MockDataExports(TestCase):
             '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"Radial";"0";"1";"0";"3";"Yes";"No";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Bilateral";"0";"0";"1";"2";"No / Unsure";"Yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"',
         ]
-        lines = self.run_csv_export_test(export_options)
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_xls_export_english_labels(self):
         export_options = {'lang': 'English'}
@@ -373,8 +366,7 @@ class MockDataExports(TestCase):
             ['2017-10-23T05:41:14.000-04:00', '2017-10-23T05:41:32.000-04:00', 'Radial', '0', '1', '0', '3', 'Yes', 'No', 62.0, '317ba7b7-bea4-4a8c-8620-a483c3079c4b', '2017-10-23T09:41:38', '', 2.0],
             ['2017-10-23T05:41:32.000-04:00', '2017-10-23T05:42:05.000-04:00', 'Bilateral', '0', '0', '1', '2', 'No / Unsure', 'Yes', 63.0, '3f15cdfe-3eab-4678-8352-7806febf158d', '2017-10-23T09:42:11', '', 3.0],
         ]
-        rows = self.run_xls_export_test(export_options)
-        assert rows == expected_rows
+        assert expected_rows == self.run_xls_export_test(export_options)
 
     def test_xls_export_english_labels_partial_submissions(self):
         export_options = {'lang': 'English'}
@@ -383,8 +375,7 @@ class MockDataExports(TestCase):
             _tag_row(14, (2, 'symmetry'), (6, 'segments'), (7, 'fluids')),
             ['2017-10-23T05:41:32.000-04:00', '2017-10-23T05:42:05.000-04:00', 'Bilateral', '0', '0', '1', '2', 'No / Unsure', 'Yes', 63.0, '3f15cdfe-3eab-4678-8352-7806febf158d', '2017-10-23T09:42:11', '', 1.0],
         ]
-        rows = self.run_xls_export_test(export_options, user=self.anotheruser)
-        assert rows == expected_rows
+        assert expected_rows == self.run_xls_export_test(export_options, user=self.anotheruser)
 
     def test_export_spss_labels(self):
         export_task = ExportTask()
@@ -604,9 +595,9 @@ class MockDataExports(TestCase):
             '"no";"62";"317ba7b7-bea4-4a8c-8620-a483c3079c4b";"2017-10-23T09:41:38";"";"2"',
             '"yes";"63";"3f15cdfe-3eab-4678-8352-7806febf158d";"2017-10-23T09:42:11";"";"3"'
         ]
-        lines = self.run_csv_export_test({'fields_from_all_versions': 'false'})
-        for (ii, line) in enumerate(lines):
-            assert line == expected_lines[ii]
+        export_options = {'fields_from_all_versions': 'false'}
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(export_options)):
+            assert a == b
 
     def test_export_exceeding_api_submission_limit(self):
         """
@@ -639,13 +630,14 @@ class MockDataExports(TestCase):
         # Don't forget to add one for the header row!
         self.assertEqual(len(list(export_task.result)), limit + excess + 1)
 
+    @pytest.mark.skip(reason='waiting on a1d05eba1 issue 24')
     def test_export_with_disabled_questions(self):
         asset = Asset.objects.create(
             name='Form with undocumented `disabled` column',
             owner=self.asset.owner,
             content={'survey': [
                 {'name': 'q', 'type': 'integer'},
-                {'name': 'ignore', 'type': 'select_one nope', 'disabled': True},
+                {'type': '#select_one', 'select_from': 'nop', 'name': 'ignore'},
             ]},
         )
         asset.deploy(backend='mock', active=True)
@@ -658,4 +650,5 @@ class MockDataExports(TestCase):
             '"123";"";"";"";"";"1"',
         ]
         # fails with `KeyError` prior to fix for kobotoolbox/formpack#219
-        self.run_csv_export_test(expected_lines, asset=asset)
+        for (a, b) in zip(expected_lines, self.run_csv_export_test(asset=asset)):
+            assert a == b

@@ -14,6 +14,8 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 from kpi.deployment_backends.kc_access.shadow_models import ShadowModel
 
 
+# TODO: Remove this? It should not be needed now that KoBoCAT has a separate
+# database
 def delete_related_objects(modeladmin, request, queryset):
     """
     Action that deletes related objects for the selected items.

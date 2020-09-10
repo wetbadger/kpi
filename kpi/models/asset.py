@@ -961,6 +961,8 @@ class Asset(ObjectPermissionMixin,
                 snapshot = False
         except AssetSnapshot.MultipleObjectsReturned:
             # how did multiple snapshots get here?
+            # FIXME: because `transaction.atomic` does not prevent `INSERT`s
+            #   into the table between our `get()` and `create()` calls!
             snaps = AssetSnapshot.objects.filter(asset=self,
                                                  asset_version=asset_version)
             snaps.delete()
@@ -1100,6 +1102,8 @@ class AssetSnapshot(models.Model, XlsExportable, FormpackXLSFormUtils):
                                          null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     uid = KpiUidField(uid_prefix='s')
+
+    # FIXME: this model should have a `unique_together` constraint
 
     @property
     def content(self):

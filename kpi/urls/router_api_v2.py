@@ -17,6 +17,7 @@ from kpi.views.v2.data import DataViewSet
 from kpi.views.v2.permission import PermissionViewSet
 from kpi.views.v2.user import UserViewSet
 
+from kpi.views.v2.reports import ReportsViewSet
 
 URL_NAMESPACE = 'api_v2'
 
@@ -53,6 +54,12 @@ asset_routes.register(r'hook-signal',
                       parents_query_lookups=['asset'],
                       )
 
+asset_routes.register(r'reports',
+                       ReportsViewSet,
+                       basename='report',
+                       parents_query_lookups=['asset'],
+                       )
+
 hook_routes = asset_routes.register(r'hooks',
                                     HookViewSet,
                                     basename='hook',
@@ -79,7 +86,7 @@ router_api_v2.register(r'users', UserViewSet)
 router_api_v2.register(r'permissions', PermissionViewSet)
 
 # TODO migrate ViewSet below
-# router_api_v2.register(r'reports', ReportsViewSet, basename='reports')
+# 
 # router_api_v2.register(r'imports', ImportTaskViewSet)
 # router_api_v2.register(r'exports', ExportTaskViewSet)
 # router_api_v2.register(r'sitewide_messages', SitewideMessageViewSet)

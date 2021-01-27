@@ -5,7 +5,7 @@ from kobo.apps.hook.views.v1.hook import HookViewSet
 from kobo.apps.hook.views.v1.hook_log import HookLogViewSet
 from kobo.apps.hook.views.v1.hook_signal import HookSignalViewSet
 
-from kobo.apps.reports.views import ReportsViewSet
+from kpi.views.v1.reports import ReportsViewSet
 from kpi.views.v1 import (
     AssetViewSet,
     AssetVersionViewSet,

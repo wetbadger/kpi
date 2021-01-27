@@ -18,6 +18,7 @@ from kpi.models import Asset
 from kpi.models import AssetFile
 from kpi.models import AssetVersion
 from kpi.serializers.v2.asset import AssetListSerializer
+from kpi.serializers.v2.reports import ReportsListSerializer, ReportsDetailSerializer
 from kpi.tests.base_test_case import BaseAssetTestCase, BaseTestCase
 from kpi.tests.kpi_test_case import KpiTestCase
 from kpi.urls.router_api_v2 import URL_NAMESPACE as ROUTER_URL_NAMESPACE
@@ -357,6 +358,13 @@ class AssetsDetailApiTests(BaseAssetTestCase):
             expected_default=self.asset.report_styles,
             test_data=test_data
         )
+
+    def test_report_request(self):
+        report_url = reverse(self._get_endpoint('report-list'),
+                                 args={'uid': self.asset_uid})
+        report_response = self.client.get(report_url)
+        self.assertEqual(report_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(report_response.data.get('count'), 1)
 
     def test_map_styles_field(self):
         self.check_asset_writable_json_field('map_styles')

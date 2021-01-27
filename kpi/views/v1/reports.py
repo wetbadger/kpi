@@ -9,7 +9,7 @@ from kpi.constants import (
 )
 from kpi.models import Asset
 from kpi.models.object_permission import get_objects_for_user, get_anonymous_user
-from .serializers import ReportsListSerializer, ReportsDetailSerializer
+from kpi.serializers.v1.reports import ReportsListSerializer, ReportsDetailSerializer
 
 
 class ReportsViewSet(mixins.ListModelMixin,
@@ -43,9 +43,14 @@ class ReportsViewSet(mixins.ListModelMixin,
                 return asset
         raise Http404
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(str(queryset.query), flush=True)
+        return super().list(request, *args, **kwargs)
+        
 
     def get_queryset(self):
-        queryset = Asset.objects.filter(asset_type=ASSET_TYPE_SURVEY)
+        queryset = Asset.objects.filter(asset_type=ASSET_TYPE_SURVEY, uid=self.asset_uid)
         if self.action == 'retrieve':
             # `get_object()` will do the checking; no need to manipulate the
             # queryset further

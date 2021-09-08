@@ -18,3 +18,13 @@ declare module 'react-autobind' {
   function autoBind(thisToBeBound: any): void
   export default autoBind
 }
+
+interface HashHistoryListenData {
+  action: string
+  hash: string
+  key: string|null
+  pathname: string
+  query: {}
+  search: string
+  state: any
+}

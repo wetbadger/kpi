@@ -31,8 +31,6 @@ class MediaFileRenderer(renderers.BaseRenderer):
 
 
 class AudioConversionViewSet(viewsets.ViewSet):
-    # probably nested in Data
-    # need the submission ID to get the inputs for the deployment backend method
     lookup_field = 'filename'
     renderer_classes = (
                         MediaFileRenderer,
@@ -44,10 +42,8 @@ class AudioConversionViewSet(viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
         format_type = kwargs.get('format', request.GET.get('format', 'json'))
-        # the audio file will probably need to be posted by the UI or user to be accessible
-        # filename = kwargs['filename']
-        # print(filename, flush=True)
-
+        # hard coding information for now
+        # TODO: Hook up to the data endpoint and get a filter for paths
         asset_uid = 'aytEVVy9VNd9b7vJPACm3n'
             # kwargs['parent_lookup_asset']
         data_id = '360'
@@ -73,8 +69,6 @@ class AudioConversionViewSet(viewsets.ViewSet):
         with open(f'tmp/random_filename.mp3', encoding='utf8', errors='ignore') as f:
             content = f.read()
 
-
-        # converted = File(converted)
         return Response(
             content,
             # content_type='audio/mp3',

@@ -59,6 +59,7 @@ export default class ProjectExportsCreator extends React.Component {
       isCustomSelectionEnabled: DEFAULT_EXPORT_SETTINGS.CUSTOM_SELECTION,
       isFlattenGeoJsonEnabled: DEFAULT_EXPORT_SETTINGS.FLATTEN_GEO_JSON,
       isXlsTypesAsTextEnabled: DEFAULT_EXPORT_SETTINGS.XLS_TYPES_AS_TEXT,
+      isIncludeAnalysisFieldsEnabled: DEFAULT_EXPORT_SETTINGS.INCLUDE_ANALYSIS_FIELDS,
       isIncludeMediaUrlEnabled: DEFAULT_EXPORT_SETTINGS.INCLUDE_MEDIA_URL,
       selectedRows: new Set(),
       selectableRowsCount: 0,
@@ -107,6 +108,7 @@ export default class ProjectExportsCreator extends React.Component {
       isCustomSelectionEnabled: DEFAULT_EXPORT_SETTINGS.CUSTOM_SELECTION,
       isFlattenGeoJsonEnabled: DEFAULT_EXPORT_SETTINGS.FLATTEN_GEO_JSON,
       isXlsTypesAsTextEnabled: DEFAULT_EXPORT_SETTINGS.XLS_TYPES_AS_TEXT,
+      isIncludeAnalysisFieldsEnabled: DEFAULT_EXPORT_SETTINGS.INCLUDE_ANALYSIS_FIELDS,
       isIncludeMediaUrlEnabled: DEFAULT_EXPORT_SETTINGS.INCLUDE_MEDIA_URL,
       selectedRows: new Set(this.getAllSelectableRows()),
     });
@@ -315,6 +317,7 @@ export default class ProjectExportsCreator extends React.Component {
       isCustomSelectionEnabled: customSelectionEnabled,
       isFlattenGeoJsonEnabled: data.export_settings.flatten,
       isXlsTypesAsTextEnabled: data.export_settings.xls_types_as_text,
+      isIncludeAnalysisFieldsEnabled: data.export_settings.include_analysis_fields,
       isIncludeMediaUrlEnabled: data.export_settings.include_media_url,
       selectedRows: new Set(data.export_settings.fields),
     };
@@ -360,11 +363,12 @@ export default class ProjectExportsCreator extends React.Component {
       payload.export_settings.xls_types_as_text = this.state.isXlsTypesAsTextEnabled;
     }
 
-    // include_media_url is only for xls and csv
+    // include_media_url and include_analysis_fields is only for xls and csv
     if (this.state.selectedExportType.value === EXPORT_TYPES.xls.value ||
         this.state.selectedExportType.value === EXPORT_TYPES.csv.value
     ) {
       payload.export_settings.include_media_url = this.state.isIncludeMediaUrlEnabled;
+      payload.export_settings.include_analysis_fields = this.state.isIncludeAnalysisFieldsEnabled;
     }
 
     // if custom export is enabled, but there is no name provided
@@ -566,13 +570,24 @@ export default class ProjectExportsCreator extends React.Component {
 
           {(this.state.selectedExportType.value === EXPORT_TYPES.xls.value ||
               this.state.selectedExportType.value == EXPORT_TYPES.csv.value) &&
-            <bem.ProjectDownloads__columnRow>
-              <Checkbox
-                checked={this.state.isIncludeMediaUrlEnabled}
-                onChange={this.onAnyInputChange.bind(this, 'isIncludeMediaUrlEnabled')}
-                label={t('Include media URLs')}
-              />
-            </bem.ProjectDownloads__columnRow>
+                <bem.ProjectDownloads__columnRow>
+                  <Checkbox
+                    checked={this.state.isIncludeMediaUrlEnabled}
+                    onChange={this.onAnyInputChange.bind(this, 'isIncludeMediaUrlEnabled')}
+                    label={t('Include media URLs')}
+                  />
+                </bem.ProjectDownloads__columnRow>
+          }
+
+          {(this.state.selectedExportType.value === EXPORT_TYPES.xls.value ||
+              this.state.selectedExportType.value == EXPORT_TYPES.csv.value) &&
+                <bem.ProjectDownloads__columnRow>
+                  <Checkbox
+                    checked={this.state.isIncludeAnalysisFieldsEnabled}
+                    onChange={this.onAnyInputChange.bind(this, 'isIncludeAnalysisFieldsEnabled')}
+                    label={t('Include analysis fields')}
+                  />
+                </bem.ProjectDownloads__columnRow>
           }
 
           <bem.ProjectDownloads__columnRow>

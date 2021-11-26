@@ -33,6 +33,7 @@ from formpack.schema.fields import (
 )
 from formpack.utils.string import ellipsize
 from formpack.utils.kobo_locking import get_kobo_locking_profiles
+from formpack.constants import EXPORT_SETTING_INCLUDE_ANALYSIS_FIELDS
 from kobo.apps.reports.report_data import build_formpack
 from kpi.constants import (
     ASSET_TYPE_COLLECTION,
@@ -40,8 +41,8 @@ from kpi.constants import (
     ASSET_TYPE_SURVEY,
     ASSET_TYPE_TEMPLATE,
     PERM_CHANGE_ASSET,
-    PERM_VIEW_SUBMISSIONS,
     PERM_PARTIAL_SUBMISSIONS,
+    PERM_VIEW_SUBMISSIONS,
 )
 from kpi.utils.log import logging
 from kpi.utils.strings import to_str
@@ -540,6 +541,9 @@ class ExportTask(ImportExportTask):
         fields = self.data.get('fields', [])
         xls_types_as_text = self.data.get('xls_types_as_text', True)
         include_media_url = self.data.get('include_media_url', False)
+        include_analysis_fields = self.data.get(
+            EXPORT_SETTING_INCLUDE_ANALYSIS_FIELDS, False
+        )
         force_index = True if not fields or '_index' in fields else False
         try:
             # If applicable, substitute the constants that formpack expects for
@@ -561,6 +565,7 @@ class ExportTask(ImportExportTask):
             'filter_fields': fields,
             'xls_types_as_text': xls_types_as_text,
             'include_media_url': include_media_url,
+            EXPORT_SETTING_INCLUDE_ANALYSIS_FIELDS: include_analysis_fields,
         }
 
     def _record_last_submission_time(self, submission_stream):

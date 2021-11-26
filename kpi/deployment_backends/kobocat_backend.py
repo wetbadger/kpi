@@ -2,6 +2,7 @@
 import copy
 import io
 import json
+import os
 import posixpath
 import re
 import uuid
@@ -511,6 +512,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         return _uuid, f'uuid:{_uuid}'
 
     def get_attachment_content(self, user, submission_uuid, response_xpath):
+
         try:
             submission_xml = next(
                 self.get_submissions(
@@ -519,13 +521,43 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             )
         except StopIteration:
             raise Exception('OOPSIE')  # no matching submission; what do we do?
+
+        # add exception handling for element/id not found - check expection.py
         submission_tree = ET.ElementTree(ET.fromstring(submission_xml))
         response_element = submission_tree.find(response_xpath)
         response_filename = response_element.text
-        raise NotImplementedError(
-            f'Congratulations, you just found {response_filename}. '
-            'What are you going to do next?'
-        )
+
+        try:
+            submission_json = next(
+                self.get_submissions(
+                    user, format_type='json', query={'_uuid': submission_uuid}
+                )
+            )
+        except StopIteration:
+            raise Exception('OOPSIE')  # no matching submission; what do we do?
+
+        attachments = submission_json['_attachments']
+        for attachment in attachments:
+            filename = posixpath.split(attachment['filename'])[1]
+            if response_filename == filename:
+                file_response = requests.get(attachment['download_url'])
+                with open(f'tmp/{filename}', 'wb') as f:
+                    f.write(file_response.content)
+
+                file = open(f'tmp/{filename}', 'rb')
+                os.remove(f'tmp/{filename}')
+                return file
+
+
+        # convert audio
+        # only store audio temporarily - do not save
+        #
+
+        # raise NotImplementedError(
+        #     f'Congratulations, you just found {response_filename}. '
+        #     'What are you going to do next?'
+        # )
+
 
     def get_data_download_links(self):
         exports_base_url = '/'.join((

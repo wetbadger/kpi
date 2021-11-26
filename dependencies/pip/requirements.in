@@ -55,6 +55,7 @@ djangorestframework-xml
 django-redis-sessions
 django-request-cache
 drf-extensions
+pydub
 future
 geojson-rewind
 jsonfield

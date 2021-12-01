@@ -2,7 +2,6 @@
 import copy
 import io
 import json
-import os
 import posixpath
 import re
 import uuid
@@ -520,12 +519,17 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 )
             )
         except StopIteration:
-            raise Exception('OOPSIE')  # no matching submission; what do we do?
+            raise Http404
 
         # add exception handling for element/id not found - check expection.py
-        submission_tree = ET.ElementTree(ET.fromstring(submission_xml))
+        submission_tree = ET.ElementTree(
+            ET.fromstring(submission_xml)
+        )
         response_element = submission_tree.find(response_xpath)
-        response_filename = response_element.text
+        try:
+            response_filename = response_element.text
+        except AttributeError:
+            raise Exception(_('XPath not found'))
 
         try:
             submission_json = next(
@@ -534,30 +538,20 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 )
             )
         except StopIteration:
-            raise Exception('OOPSIE')  # no matching submission; what do we do?
+            raise Exception('No matching submission')
 
         attachments = submission_json['_attachments']
         for attachment in attachments:
             filename = posixpath.split(attachment['filename'])[1]
             if response_filename == filename:
-                file_response = requests.get(attachment['download_url'])
-                with open(f'tmp/{filename}', 'wb') as f:
-                    f.write(file_response.content)
-
-                file = open(f'tmp/{filename}', 'rb')
-                os.remove(f'tmp/{filename}')
-                return file
-
-
-        # convert audio
-        # only store audio temporarily - do not save
-        #
-
-        # raise NotImplementedError(
-        #     f'Congratulations, you just found {response_filename}. '
-        #     'What are you going to do next?'
-        # )
-
+                file_response = self.__kobocat_proxy_request(
+                    requests.Request(
+                        method='GET', url=attachment['download_url']
+                    ),
+                    self.asset.owner
+                )
+                file_response.raise_for_status()
+                return file_response.content, file_response.headers['content-type']
 
     def get_data_download_links(self):
         exports_base_url = '/'.join((

@@ -43,12 +43,6 @@ asset_routes.register(r'versions',
                       parents_query_lookups=['asset'],
                       )
 
-asset_routes.register(r'data',
-                      DataViewSet,
-                      basename='submission',
-                      parents_query_lookups=['asset'],
-                      )
-
 asset_routes.register(r'export-settings',
                       AssetExportSettingsViewSet,
                       basename='asset-export-settings',
@@ -73,6 +67,18 @@ asset_routes.register(r'paired-data',
                       parents_query_lookups=['asset'],
                       )
 
+data_routes = asset_routes.register(r'data',
+                                    DataViewSet,
+                                    basename='submission',
+                                    parents_query_lookups=['asset'],
+                                    )
+
+data_routes.register(r'audio-conversion',
+                     AudioConversionViewSet,
+                     basename='audio',
+                     parents_query_lookups=['asset', 'data'],
+                     )
+
 hook_routes = asset_routes.register(r'hooks',
                                     HookViewSet,
                                     basename='hook',
@@ -91,7 +97,6 @@ router_api_v2.register(
 router_api_v2.register(r'users', UserViewSet)
 router_api_v2.register(r'permissions', PermissionViewSet)
 router_api_v2.register(r'imports', ImportTaskViewSet)
-router_api_v2.register(r'audio_conversion', AudioConversionViewSet, basename='audio')
 
 # TODO migrate ViewSet below
 # router_api_v2.register(r'sitewide_messages', SitewideMessageViewSet)

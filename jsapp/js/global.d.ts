@@ -10,6 +10,16 @@ declare module 'alertifyjs' {
   }
 }
 
+interface HashHistoryListenData {
+  action: string
+  hash: string
+  key: string|null
+  pathname: string
+  query: {}
+  search: string
+  state: any
+}
+
 declare module 'react-autobind' {
   /**
    * NOTE: please DO NOT USE unless refactoring old code, as the autobind

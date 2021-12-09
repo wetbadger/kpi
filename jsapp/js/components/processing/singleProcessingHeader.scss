@@ -1,123 +1,72 @@
-@import "scss/_colors";
+@use "scss/_colors";
+@use "scss/sizes";
+@use "scss/mixins";
+@use "js/components/common/button";
 
 .single-processing-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  color: $kobo-gray-40;
-  background-color: $kobo-white;
+  @include mixins.centerRowFlex;
+  color: colors.$kobo-gray-40;
+  background-color: colors.$kobo-white;
 }
 
 .single-processing-header__type-icon {
-  display: flex;
-  flex-direction: row;
+  @include mixins.centerRowFlex;
   justify-content: center;
-  align-items: center;
-  color: $kobo-white;
-  background-color: $kobo-teal;
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
+  color: colors.$kobo-white;
+  background-color: colors.$kobo-teal;
+  width: sizes.$x52;
+  height: sizes.$x52;
+  border-radius: sizes.$x8;
 
   .k-icon {
-    font-size: 24px;
+    font-size: sizes.$x24;
   }
 }
 
 .single-processing-header__count {
-  font-size: 16px;
+  font-size: sizes.$x16;
 }
 
 .single-processing-header__question {
-  font-size: 21px;
+  font-size: sizes.$x21;
   font-weight: 500;
-  margin: 4px 0 0;
+  margin: sizes.$x4 0 0;
 }
 
 .single-processing-header__column {
   &.single-processing-header__column--icon {
-    margin: 12px;
+    margin: sizes.$x12;
   }
 
   &.single-processing-header__column--main {
     flex: 1;
-    margin: 0 12px;
+    margin: 0 sizes.$x12;
   }
 
   &.single-processing-header__column--navigation {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-right: 18px;
+    @include mixins.centerRowFlex;
+    margin-right: sizes.$x18;
   }
 }
 
-.single-processing-header__button,
 .single-processing-header__number {
-  border-radius: 8px;
-  height: 42px;
-  line-height: 38px;
-  font-size: 18px;
+  border-radius: sizes.$x8;
+  height: button.$button-height-l;
+  line-height: button.$button-height-l - (2 * sizes.$x1); // minus the border
+  font-size: button.$button-font-l;
   text-transform: uppercase;
   font-weight: 700;
-  margin: 0 6px;
-  padding: 0 6px;
-}
-
-.single-processing-header__number {
-  min-width: 42px;
+  padding: 0 sizes.$x6;
+  min-width: button.$button-height-l;
   text-align: center;
-  border-color: $kobo-gray-92;
+  border-color: colors.$kobo-gray-92;
   cursor: default;
-}
-
-.single-processing-header__number,
-.single-processing-header__button.single-processing-header__button--done {
-  border-width: 2px;
+  border-width: sizes.$x1;
   border-style: solid;
 }
 
-.single-processing-header__button {
-  cursor: pointer;
-  color: $kobo-blue;
-  background-color: transparent;
-  border: 0;
-
-  &[disabled] {
-    pointer-events: none;
-    opacity: 0.5;
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
-
-  &:hover {
-    background-color: $kobo-gray-92;
-  }
-
-  &.single-processing-header__button--prev,
-  &.single-processing-header__button--next {
-    .k-icon {
-      vertical-align: top;
-    }
-  }
-
-  &.single-processing-header__button--prev {
-    padding-right: 12px;
-  }
-
-  &.single-processing-header__button--next {
-    padding-left: 12px;
-  }
-
-  &.single-processing-header__button--done {
-    border-color: $kobo-blue;
-    padding: 0 24px;
-
-    &:hover {
-      color: colors.$kobo-white;
-      background-color: colors.$kobo-blue;
-    }
+.single-processing-header__column.single-processing-header__column--navigation {
+  > *:not(:last-child) {
+    margin-right: sizes.$x4;
   }
 }

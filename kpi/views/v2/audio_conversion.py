@@ -4,12 +4,6 @@ from tempfile import NamedTemporaryFile
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import (
     renderers,
-from django.utils.translation import ugettext_lazy as _
-
-from django.core.files import File
-from rest_framework import (
-    renderers,
-    status,
     viewsets
 )
 from rest_framework.pagination import _positive_int as positive_int

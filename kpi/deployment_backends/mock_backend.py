@@ -1,14 +1,19 @@
 # coding: utf-8
 import copy
+import pickle
+import posixpath
 import time
 import uuid
 from datetime import datetime
+from io import BytesIO
 from typing import Optional
+from xml.etree import ElementTree as ET
 
 import pytz
 from deepmerge import always_merger
 from dicttoxml import dicttoxml
 from django.conf import settings
+from django.core.files import File
 from django.urls import reverse
 from rest_framework import status
 
@@ -526,3 +531,43 @@ class MockDeploymentBackend(BaseDeploymentBackend):
             del submission[k]
 
         return submission
+
+    def get_attachment_content(self, user, submission_uuid, response_xpath):
+
+        try:
+            submission_xml = next(
+                iter(
+                    self.get_submissions(
+                        user, format_type='xml', query={'_uuid': submission_uuid}
+                    )
+                )
+            )
+        except StopIteration:
+            raise Http404
+
+        # add exception handling for element/id not found - check expection.py
+        submission_tree = ET.ElementTree(
+            ET.fromstring(submission_xml)
+        )
+        response_element = submission_tree.find(response_xpath)
+        try:
+            response_filename = response_element.text
+        except AttributeError:
+            raise Exception(_('XPath not found'))
+
+        try:
+            submission_json = next(
+                iter(
+                    self.get_submissions(
+                        user, format_type='json', query={'_uuid': submission_uuid}
+                    )
+                )
+            )
+        except StopIteration:
+            raise Exception('No matching submission')
+
+        with open('kpi/tests/audio_conversion_test_clip.mp4', 'rb') as f:
+            file_response = f.read()
+        # file_response = BytesIO(open('kpi/tests/audio_conversion_test_clip.mp4'))
+        content_type = 'video/mp4'
+        return file_response, content_type

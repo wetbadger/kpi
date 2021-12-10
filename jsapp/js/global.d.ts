@@ -10,15 +10,6 @@ declare module 'alertifyjs' {
   }
 }
 
-declare module 'react-autobind' {
-  /**
-   * NOTE: please DO NOT USE unless refactoring old code, as the autobind
-   * project was abandoned years ago. Just use regular `.bind(this)`.
-   */
-  function autoBind(thisToBeBound: any): void
-  export default autoBind
-}
-
 interface HashHistoryListenData {
   action: string
   hash: string
@@ -27,4 +18,13 @@ interface HashHistoryListenData {
   query: {}
   search: string
   state: any
+}
+
+declare module 'react-autobind' {
+  /**
+   * NOTE: please DO NOT USE unless refactoring old code, as the autobind
+   * project was abandoned years ago. Just use regular `.bind(this)`.
+   */
+  function autoBind(thisToBeBound: any): void
+  export default autoBind
 }

@@ -1,0 +1,14 @@
+{
+  "name": "kpi-tests",
+  "version": "1.0.0",
+  "description": "For testing KoBoToolbox",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ben Alexander",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^9.2.0"
+  }
+}

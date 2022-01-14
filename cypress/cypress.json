@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://google.com",
+  "testFiles": [
+    "form.spec.js"
+  ]
+}

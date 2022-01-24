@@ -1,0 +1,7 @@
+TODO:
+
+Make static pages with selenium
+
+An empty account for form creation. Selenium cleanup task.
+An account with premade forms for editing.
+An account with deployed forms for submissions.

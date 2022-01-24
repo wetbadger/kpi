@@ -1,0 +1,30 @@
+11/16/21
+
+4hrs
+
+Studied Cypress docs
+Made tests for creating of a form, adding a question,
+
+11/17/21
+
+2hrs
+
+making a submission
+
+11/18/21
+
+5hrs
+
+making a submission, deploying a form, deleting forms
+
+I worked on fully understanding some of Cypress' best practices.
+I came up with the solution of storing values locally to keep track of which forms are deployed.
+
+11/19/21
+
+2hrs
+
+Finalizing and cleaning up some code.
+Randomized form submission.
+
+Total time spent: 13hrs

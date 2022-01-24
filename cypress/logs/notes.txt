@@ -1,0 +1,38 @@
+Structure:
+
+    fixures: json data used by the tests.
+    integration: the code for the tests themself
+    support: custom commands and code that is run before all tests
+    cypress.json: order in which tests are carried out
+
+Best practices:
+
+    Custom selectors used for testing are considered best practice.
+
+        https://docs.cypress.io/guides/references/best-practices#Selecting-Elements
+
+Dashboard:
+
+    Cypress Dashboard is free to use for non-commercial, open source projects. It may be a good idea to use this tool.
+
+Other issues:
+
+    Testing with shadow DOM. (I don't seem to be able to access these, but has not effected tests yet.)
+
+        https://testersdock.com/cypress-shadow-dom/
+
+        https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM
+
+Errors:
+
+    Save error: frequent
+      "This record name or ID already exists."
+      possibly this? https://community.kobotoolbox.org/t/error-when-user-submits-form-save-error-registry-id-already-exists/3779
+
+    Last item from list incorrectly saved as "Object6": consistent
+
+See also:
+
+    Using selenium and cypress together.
+
+        https://medium.com/@kamran.athar23/cypress-and-selenium-together-to-achieve-multiple-browser-testing-409e2af77838
